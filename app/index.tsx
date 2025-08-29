@@ -4,6 +4,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 
@@ -13,17 +14,32 @@ import { Stack } from "expo-router";
 import { useState } from "react";
 
 export default function HomeScreen() {
-  const posts: PostData[] = [
+  const [posts, setPosts] = useState<PostData[]>  ([
     {
-      title: "Mitt flrste innlegg",
+      title: "Mitt første innlegg",
       description: "Sensasjonelt!",
     },
     {
       title: "Mitt andre innlegg",
       description: "Ubeskrivelig flott",
     },
-  ];
+  ]);
 
+  const [newTitle, setNewTitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
+
+  const addPost = () => {
+    if (newTitle && newDescription) {
+      const newPost: PostData = {
+        title: newTitle,
+        description: newDescription,
+      };
+      setPosts([newPost, ...posts]);
+      setNewTitle("");
+      setNewDescription("");
+      setIsModalVisible(false);
+    }
+  };
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   return (
@@ -32,15 +48,30 @@ export default function HomeScreen() {
         options={{
           headerRight: () => (
             <Pressable onPress={() => setIsModalVisible(true)}>
-              <Text>Knapp?</Text>
+              <Text>Knapp</Text>
             </Pressable>
           ),
         }}
       />
       <Modal visible={isModalVisible} animationType="slide">
-        <Pressable onPress={() => console.log("Kna")}>
-          <Text>Knapp?</Text>
-        </Pressable>
+        <View style={styles.post}>
+          <TextInput
+            placeholder="Tittel"
+            value={newTitle}
+            onChangeText={setNewTitle}
+          />
+          <TextInput
+          placeholder="Beskrivelse"
+          value={newDescription}
+          onChangeText={setNewDescription}
+          />
+          <Pressable onPress={addPost}>
+            <Text>Lagre</Text>
+          </Pressable>
+          <Pressable onPress={() => setIsModalVisible(false)}>
+            <Text>Lukk</Text>
+          </Pressable>
+        </View>
       </Modal>
       <FlatList
         data={posts}
